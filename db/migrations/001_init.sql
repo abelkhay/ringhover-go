@@ -1,30 +1,43 @@
-CREATE DATABASE IF NOT EXISTS tasking;
+DROP DATABASE IF EXISTS tasking;
+CREATE DATABASE tasking;
 USE tasking;
 
-DROP TABLE IF EXISTS tasks;
-DROP TABLE IF EXISTS categories;
-
+-- Category
 CREATE TABLE categories (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(255) NOT NULL
-);
+  id   BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL UNIQUE
+) ENGINE=InnoDB;
 
+-- Task (root/children)
 CREATE TABLE tasks (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  description TEXT NULL,
-  category_id INT NOT NULL,
-  parent_task_id INT NULL,
-  CONSTRAINT fk_tasks_category FOREIGN KEY (category_id) REFERENCES categories(id),
-  CONSTRAINT fk_tasks_parent FOREIGN KEY (parent_task_id) REFERENCES tasks(id) ON DELETE CASCADE
-);
+  id             BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  title          VARCHAR(255) NOT NULL,
+  description    TEXT,
+  status         ENUM('todo','in_progress','done') NOT NULL DEFAULT 'todo',
+  priority       TINYINT NOT NULL DEFAULT 0,
+  due_date       DATE NULL,
+  completed_at   DATETIME NULL,
+  parent_task_id BIGINT UNSIGNED NULL,
+  category_id    BIGINT UNSIGNED NULL,
+  created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_parent (parent_task_id),
+  KEY idx_category (category_id),
+  CONSTRAINT fk_task_parent   FOREIGN KEY (parent_task_id) REFERENCES tasks(id)      ON DELETE CASCADE,
+  CONSTRAINT fk_task_category FOREIGN KEY (category_id)    REFERENCES categories(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
 
-CREATE INDEX idx_parent ON tasks(parent_task_id);
+INSERT INTO categories (name) VALUES
+('Backend'), ('Frontend'), ('Bug'), ('Feature');
 
-INSERT INTO categories (name) VALUES ('Work'), ('Home');
-INSERT INTO tasks (name, description, category_id, parent_task_id) VALUES
-('Root task A', 'top-level', 1, NULL),
-('Sub A1', 'child', 1, 1),
-('Sub A2', 'child', 1, 1),
-('Root task B', 'top-level', 2, NULL),
-('Sub B1', 'child', 2, 4);
+INSERT INTO tasks (title, status, priority, due_date, category_id) VALUES
+('Implémenter API Auth', 'in_progress', 3, '2025-08-20', 1),
+('Créer Dashboard UI',  'todo',        2, '2025-08-25', 2),
+('Corriger bug login',  'todo',        4, '2025-08-15', 3);
+
+INSERT INTO tasks (title, status, priority, due_date, parent_task_id, category_id) VALUES
+('Ajouter OAuth2',  'todo', 2, '2025-08-18', 1, 1),
+('Configurer JWT',  'todo', 3, '2025-08-19', 1, 1);
+
+INSERT INTO tasks (title, status, priority, due_date, parent_task_id, category_id) VALUES
+('Créer composant Graphique', 'in_progress', 2, '2025-08-22', 2, 2);

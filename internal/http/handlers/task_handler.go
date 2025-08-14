@@ -86,7 +86,7 @@ func (h *Handler) DeleteTask(c *gin.Context) {
 	if err = h.service.DeleteTask(taskId); err != nil {
 		return
 	}
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusNoContent, nil)
 }
 
 // DeleteTask HTTP handler allows to delete a task and all associated substasks.

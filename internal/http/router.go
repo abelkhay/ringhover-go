@@ -15,11 +15,11 @@ func NewRouter(handler *handlers.Handler) *gin.Engine {
 	api := r.Group(endpoints.APIBase)
 	{
 		api.GET(endpoints.HealthPath, func(c *gin.Context) { c.Status(200) })
-		api.GET(endpoints.TasksPath, handler.GetRootTasksWithCategories) //1
-		api.GET(endpoints.TaskSubtasks, handler.GetSubtasks)             //2
-		api.POST(endpoints.TasksPath, handler.CreateTask)                //3
-		api.PATCH(endpoints.TaskPath, handler.UpdateTask)                //4
-		api.DELETE(endpoints.TaskPath, handler.DeleteTask)               //5
+		api.GET(endpoints.TasksPath, handler.GetRootTasksWithCategories)
+		api.GET(endpoints.TaskSubtasks, handler.GetSubtasks)
+		api.POST(endpoints.TasksPath, handler.CreateTask)
+		api.PATCH(endpoints.TaskPath, handler.UpdateTask)
+		api.DELETE(endpoints.TaskPath, handler.DeleteTask)
 	}
 
 	return r

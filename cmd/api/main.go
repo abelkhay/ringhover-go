@@ -1,8 +1,10 @@
 package main
 
 import (
-	"log"
+	"github.com/gin-gonic/gin"
+    "go.uber.org/zap"
 
+	"ringhover-go/internal/logging"
 	"ringhover-go/internal/config"
 	"ringhover-go/internal/dao"
 	"ringhover-go/internal/db"
@@ -14,21 +16,29 @@ import (
 )
 
 func main() {
-	_ = godotenv.Load()
+
+	defer func() { _ = logging.L().Sync() }()
+	r := gin.New()
+	r.Use(logging.ZapMiddleware())
+
+	if err := godotenv.Load(".env"); err != nil {
+		logging.L().Fatal("failed to load .env", zap.Error(err))
+	}
 	cfg := config.Load()
 
 	// open DB if DSN, if not crash
 	conn, err := db.Open(cfg.MySQLDSN)
 	if err != nil {
-		log.Fatal(err)
+		logging.L().Fatal("failed to open DB", zap.Error(err))
 	}
 
-	dao := dao.NewDao(conn)
-	service := service.NewModelisationService(dao)
-	handler := handlers.NewTaskHandler(service)
 
-	r := api.NewRouter(handler)
+	daoClient := dao.NewDao(conn)
+	serviceClient := service.NewModelisationService(daoClient)
+	handlerClient := handlers.NewTaskHandler(serviceClient)
+
+	r = api.NewRouter(handlerClient)
 	if err := r.Run(":" + cfg.HTTPPort); err != nil {
-		log.Fatal(err)
+		logging.L().Fatal("server failed", zap.Error(err))
 	}
 }

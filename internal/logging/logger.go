@@ -1,22 +1,33 @@
 package logging
 
 import (
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
-func New() (*zap.Logger, error) {
-	return zap.NewProduction()
+var (
+	l    *zap.Logger
+	once sync.Once
+)
+
+func L() *zap.Logger {
+	once.Do(func() {
+		var err error
+		l, err = zap.NewProduction()
+		if err != nil { panic(err) }
+	})
+	return l
 }
 
 func ZapMiddleware() gin.HandlerFunc {
-	logger, _ := New()
+	log := L()
 	return func(c *gin.Context) {
 		start := time.Now()
 		c.Next()
-		logger.Info("http",
+		log.Info("http",
 			zap.String("method", c.Request.Method),
 			zap.String("path", c.FullPath()),
 			zap.Int("status", c.Writer.Status()),

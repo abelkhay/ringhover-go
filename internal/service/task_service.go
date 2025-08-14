@@ -160,6 +160,9 @@ func (s *Service) UpdateTask(taskId uint64, requestTask req.UpdateTaskRequest) (
 			now := time.Now()
 			taskToUpdate.CompletedAt = &now
 		}
+		if baseTask.Status == models.StatusDone &&  taskToUpdate.Status != baseTask.Status {
+			taskToUpdate.CompletedAt = nil
+		}
 	}
 
 	if requestTask.Title != nil {
@@ -191,6 +194,7 @@ func (s *Service) UpdateTask(taskId uint64, requestTask req.UpdateTaskRequest) (
 		if *requestTask.ParentTaskID == taskId {
 			return models.Task{}, daoerrors.ErrBadInput
 		}
+		taskToUpdate.ParentTaskID = requestTask.ParentTaskID
 	}
 
 	taskToUpdate.Id = taskId

@@ -6,7 +6,7 @@ import (
 )
 
 type Task struct {
-	ID           uint64        `json:"id"`
+	Id           uint64        `json:"id"`
 	Title        string        `json:"title"`
 	Description  *string       `json:"description,omitempty"`
 	Status       models.Status `json:"status"`
@@ -20,8 +20,9 @@ type Task struct {
 	Category     *Category     `json:"category,omitempty"`
 }
 
-// TaskTree: pour GET /tasks/:id/subtasks
 type TaskTree struct {
 	Task
 	Children []TaskTree `json:"children"`
 }
+
+type TaskList []Task

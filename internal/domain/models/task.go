@@ -1,10 +1,12 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 // Task table metadata.
 type Task struct {
-	ID           uint64     `db:"id"`
+	Id           uint64     `db:"id"`
 	Title        string     `db:"title"`
 	Description  *string    `db:"description"`
 	Status       Status     `db:"status"`
@@ -15,4 +17,9 @@ type Task struct {
 	CategoryID   *uint64    `db:"category_id"`
 	CreatedAt    time.Time  `db:"created_at"`
 	UpdatedAt    time.Time  `db:"updated_at"`
+}
+
+type TaskWithCategory struct {
+	Task
+	Category Category `db:"category"`
 }

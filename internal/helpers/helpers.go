@@ -13,9 +13,9 @@ func BuildSubtasksForest(rows []models.Task, rootID uint64) []resp.TaskTree {
 	// Create all nodes and index them by ID for O(1) lookups later.
 	nodes := make(map[uint64]*resp.TaskTree, len(rows))
 	for i := range rows {
-		nodes[rows[i].ID] = &resp.TaskTree{
+		nodes[rows[i].Id] = &resp.TaskTree{
 			Task: resp.Task{
-				ID:           rows[i].ID,
+				Id:           rows[i].Id,
 				Title:        rows[i].Title,
 				Description:  rows[i].Description,
 				Status:       rows[i].Status,
